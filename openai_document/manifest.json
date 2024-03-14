@@ -1,0 +1,138 @@
+{
+  "name": "OpenAI  - Docs",
+  "category": "Document (RAG)",
+  "settings": [
+    {
+      "name": "Model",
+      "description": "The GPT-family language model you want to use.",
+      "default": "gpt-4-0125-preview",
+      "type": "select",
+      "selections": [
+        "gpt-4-0125-preview",
+        "gpt-4-1106-preview",
+        "gpt-3.5-turbo-0125",
+        "gpt-3.5-turbo-1106",
+        "gpt-3.5-turbo",
+        "gpt-4"
+      ],
+      "required": true
+    },
+    {
+      "name": "Embedding Model",
+      "description": "The GPT-family embedding model you want to use.",
+      "default": "text-embedding-ada-002",
+      "type": "select",
+      "selections": [
+        "text-embedding-ada-002",
+        "text-embedding-3-large",
+        "text-embedding-3-small"
+      ],
+      "required": true
+    },
+    {
+      "name": "Context Size",
+      "description": "The max context size your model supports.",
+      "default": "4096",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "System Message",
+      "description": "A message to help instruct the model on it's usage and how to behave.",
+      "type": "textarea",
+      "default": "You are a helpful AI assistant.",
+      "required": true
+    },
+    {
+      "name": "API Key",
+      "description": "API access key. If using OpenAI, get yours from https://platform.openai.com/api-keys",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "Document Context",
+      "description": "Number of tokens to use for document context.",
+      "type": "number",
+      "default": "1200",
+      "advanced": true
+    },
+    {
+      "name": "Max Tokens to Generate",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "URL Base",
+      "description": "OpenAI API URL base. Good for connecting to other compatible APIs as well.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Embedding Model Override",
+      "description": "Will overwrite the model selection above. Any LiteLLM embedding provider is available: https://docs.litellm.ai/docs/embedding/supported_embedding . For example, `embed-english-v3.0`.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Embedding Model Override (Local)",
+      "description": "HuggingFace SentenceTransformer-based model to use for local embedding (after downloading). For example, `sentence-transformers/all-MiniLM-L6-v2`",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Completion Model Override",
+      "description": "Will overwrite the model selection above. Any LiteLLM model provider is available: https://docs.litellm.ai/docs/providers . For example, `mistral/mistral-tiny`.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Simple Model Override",
+      "description": "Used for miscellaneous tasks like titling threads for lower cost. Any LiteLLM model provider is available: https://docs.litellm.ai/docs/providers",
+      "default": "gpt-3.5-turbo-0125",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Organization ID",
+      "description": "Used by some vendors to identify the organization using the API.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "API Version",
+      "description": "Used by some vendors to identify the API to use.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Temperature",
+      "description": "Temperature as a setting that controls the AI's willingness to take risks in its word choices. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. (Between 0.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Top P",
+      "description": "Top P controls the diversity of the AI's responses by only considering a subset of all possible next words that have a cumulative probability above a certain threshold. Recommended to use Temperature OR Top-P, not both. (Between 0.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Stop Sequence",
+      "description": "Sequence where if generated the API will stop generating further tokens.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Presence Penalty",
+      "description": "Aims to reduce the likelihood of the model repeating the same information or topics it has already mentioned in the current text generation task. (Between -2.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Frequency Penalty",
+      "description": "Aims to decrease the repetition of individual words or phrases within the generated text. (Between -2.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    }
+  ]
+}

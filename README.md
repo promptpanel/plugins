@@ -1,2 +1,2 @@
-# plugins
-Community plugins for PromptPanel
+## Community Plugins
+Community plugins for PromptPanel.

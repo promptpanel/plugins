@@ -1,0 +1,48 @@
+.hljs {
+  background: #1c1917;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+code {
+  color: #57534e;
+  background: #e7e5e4;
+  padding: 1px 0.375rem;
+  border-radius: 0.25rem;
+}
+.ql-container {
+  font-size: unset !important;
+}
+.ql-editor.ql-blank::before {
+  font-family: -apple-system, ui-sans-serif, system-ui !important;
+  font-size: 1.125rem !important;
+  font-style: normal !important;
+  color: #78716c;
+}
+.ql-editor {
+  padding: 0.54rem 46px 0.54rem 0.75rem;
+}
+.ql-editor > .ql-syntax,
+.ql-editor * span {
+  font-family: -apple-system, ui-sans-serif, system-ui !important;
+  font-size: 1.125rem !important;
+  font-style: normal !important;
+  color: #1c1917 !important;
+}
+.ql-editor p,
+.ql-editor ol,
+.ql-editor ul,
+.ql-editor pre,
+.ql-editor blockquote,
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+  font-size: 1.125rem !important;
+  line-height: 1.75rem !important;
+}
+.ql-editor.ql-blank::before {
+  left: 0.75rem;
+}
