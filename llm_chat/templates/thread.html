@@ -155,26 +155,6 @@
 
             <template x-for="message in messages" :key="message.id">
               <div>
-                <template x-if="message.metadata?.sender == 'file_upload'">
-                  <div class="mb-10">
-                    <div class="z-[0] relative rounded-t-md rounded-br-md w-11/12 py-2.5">
-                      <p x-html="message.content" class="mr-1.5 w-full space-y-6 masked text-lg">Lorem ipsum...</p>
-                    </div>
-                    <div class="flex items-center text-sm text-stone-500 w-full mt-0.5">
-                      <p>File Upload</p>
-                      <p class="mx-1">•</p>
-                      <p x-text="formatDate(message.created_on)"></p>
-                      <div class="flex items-center opacity-50 hover:opacity-100">
-                        <p class="mx-1">•</p>
-                        <p @click="deleteFile(message.id, message.metadata.file_id)" class="flex items-center font-semibold cursor-pointer transition text-stone-500 hover:text-rose-600">
-                          <svg class="w-3.5 h-3.5 mr-0.5" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z" clip-rule="evenodd"></path></svg>
-                          Delete File
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </template>
-
                 <template x-if="message.metadata?.sender == 'assistant'">
                   <div class="mb-10">
                     <div class="z-[0] relative rounded-t-md rounded-br-md w-11/12 py-2.5">
@@ -209,7 +189,6 @@
                     </div>
                   </div>
                 </template>
-
                 <template x-if="message.metadata?.sender == 'error'">
                   <div class="mb-10">
                     <div class="z-[0] relative border-l-2 border-stone-200 pl-4 ml-[0.35rem] w-11/12 py-2.5">
@@ -275,21 +254,6 @@
               </div>
             </div>
 
-            <div x-show="fileStream !== ''">
-              <div class="mb-10">
-                <div class="z-[0] relative rounded-t-md rounded-br-md w-11/12 py-2.5">
-                  <p x-html="fileStream" class="mr-1.5 w-full space-y-6 masked text-lg">File Upload Status</p>
-                </div>
-                <div id="processingChat" class="mb-6 flex items-center justify-center font-semibold text-sm text-stone-500 w-max bg-stone-100 px-3 h-8 rounded-full">
-                  <span class="relative flex h-2 w-2 mr-1.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-50"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                  </span>
-                  Processing File
-                </div>
-              </div>
-            </div>
-
             <div x-show="responseStream !== ''">
               <div class="mb-10">
                 <div class="z-[0] relative rounded-t-md rounded-br-md w-11/12 py-2.5">
@@ -307,7 +271,7 @@
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-50"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Thinking of a response...
+                Processing...
               </div>
             </div>
 
@@ -331,27 +295,7 @@
               <button x-show="indicateProcessing" class="cursor-not-allowed z-20 flex items-center justify-center absolute bottom-[0.75rem] right-[0.75rem] h-7 w-7 bg-stone-200 rounded-md text-stone-400 transition duration-500">
                 <svg class="animate-spin w-5 h-5" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 22c5.421 0 10-4.579 10-10h-2c0 4.337-3.663 8-8 8s-8-3.663-8-8c0-4.336 3.663-8 8-8V2C6.579 2 2 6.58 2 12c0 5.421 4.579 10 10 10z"></path></svg>
               </button>
-
-              <!-- File Upload -->
-              <form enctype="multipart/form-data" @submit.prevent="createFileSubmit()">
-                <label for="file-upload" class="text-sm font-semibold cursor-pointer z-10 flex items-center justify-center absolute bottom-[0.45rem] left-[0.45rem] h-7 w-7 text-stone-500 rounded-md hover:bg-stone-200 hover:text-stone-600">
-                  <svg class="w-[1.125rem] h-[1.125rem] min-w-[1.125rem] min-h-[1.125rem]" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"></path></svg>
-                </label>
-                <input id="file-upload" name="file-upload" type="file" x-model="uploadedFilePath" x-on:change="extractFilename()" class="hidden" />
-                <div class="flex items-center absolute bottom-[0.45rem] left-[2.45rem] h-7 z-10">
-                  <span x-text="extractedFilename" class="text-sm text-stone-500"></span>
-                  <svg x-show="extractedFilename !== ''" @click="clearFilename()" class="ml-1 cursor-pointer w-4 h-4 text-stone-400 hover:text-rose-600" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd"></path></svg>
-                </div>
-                <!-- File Upload Button -->
-                <button type="submit" x-show="extractedFilename !== '' && !indicateProcessing" class="z-30 flex items-center justify-center absolute bottom-[0.75rem] right-[0.75rem] h-7 w-7 bg-primary rounded-md text-stone-50 transition duration-500 hover:shadow-lg focus:shadow-none">
-                  <svg class="w-4 h-4" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 013.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 013.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875zm6.905 9.97a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.72-1.72V18a.75.75 0 001.5 0v-4.19l1.72 1.72a.75.75 0 101.06-1.06l-3-3z" clip-rule="evenodd"></path>
-                    <path d="M14.25 5.25a5.23 5.23 0 00-1.279-3.434 9.768 9.768 0 016.963 6.963A5.23 5.23 0 0016.5 7.5h-1.875a.375.375 0 01-.375-.375V5.25z"></path>
-                  </svg>
-                </button>
-              </form>
-
-              <div id="quill" style="font-size: unset" class="!font-sans !min-h-[1rem] max-h-[44vh] pt-0.5 pb-12 overflow-y-auto bg-white rounded-md shadow-sm border outline-none transition" :class="quillFocused ? 'border-primary ring-2 ring-primary/10' : 'border-stone-400/50 hover:border-stone-400/70 hover:shadow'"></div>
+              <div id="quill" style="font-size: unset" class="!font-sans !min-h-[1rem] max-h-[44vh] py-0.5 overflow-y-auto bg-white rounded-md shadow-sm border outline-none transition" :class="quillFocused ? 'border-primary ring-2 ring-primary/10' : 'border-stone-400/50 hover:border-stone-400/70 hover:shadow'"></div>
             </div>
             <div class="flex items-center pb-5">
               <p class="text-stone-500 text-xs">

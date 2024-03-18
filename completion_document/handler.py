@@ -39,12 +39,14 @@ def file_stream(file, thread, panel):
         logger.info("** 1. Parse document with unstructured into elements.")
         yield "Splitting document into chunks..."
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
         ## Setup embedding model
-        if "Embedding Model Override (Local)" in settings:
-            embedding_model = settings["Embedding Model Override (Local)"]
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
+            embedding_model = settings["Sentence Transformer Embedding (Local)"]
             embedding = SentenceTransformer(embedding_model)
-        elif "Embedding Model Override" in settings:
-            embedding_model = settings["Embedding Model Override"]
         else:
             embedding_model = settings["Embedding Model"]
         logger.info("** Embedding Model: " + str(embedding_model))
@@ -66,7 +68,7 @@ def file_stream(file, thread, panel):
                 sentences.append(sentence)
                 page_numbers.append(page_number)
         ## Prepare embeddings
-        if "Embedding Model Override (Local)" in settings:
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
             embedded_sentences = embedding.encode(sentences)
         else:
             embedding_settings = {
@@ -117,7 +119,7 @@ def file_stream(file, thread, panel):
             content="Error: " + str(e),
             thread=thread,
             panel=panel,
-            created_by=message.created_by,
+            created_by=file.created_by,
             metadata={"sender": "error"},
         )
         response_message.save()
@@ -137,9 +139,7 @@ def message_handler(message, thread, panel):
 def message_handler(message, thread, panel):
     try:
         return StreamingHttpResponse(
-            chat_stream(
-                message, thread, panel, message_prepped, user_message_count, settings
-            ),
+            chat_stream(message, thread, panel),
             content_type="text/plain",
         )
     except Exception as e:
@@ -147,7 +147,7 @@ def message_handler(message, thread, panel):
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
-def chat_stream(message, thread, panel, message_prepped, user_message_count, settings):
+def chat_stream(message, thread, panel):
     ## Function:
     ## 1. Get settings.
     ## 2. Enrich incoming message with token_count.
@@ -162,6 +162,10 @@ def chat_stream(message, thread, panel, message_prepped, user_message_count, set
         ## ----- 1. Get settings.
         logger.info("** 1. Preparing settings")
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
 
         ## ----- 2. Enrich incoming message with token_count.
         if settings.get("Token Counter") == "openai":
@@ -177,16 +181,14 @@ def chat_stream(message, thread, panel, message_prepped, user_message_count, set
         ## ----- 3. Encode message as question. Retrieve similar document content as context.
         logger.info("** 3. Embed message. Retrieve content")
         ## Setup embedding model
-        if "Embedding Model Override (Local)" in settings:
-            embedding_model = settings["Embedding Model Override (Local)"]
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
+            embedding_model = settings["Sentence Transformer Embedding (Local)"]
             embedding = SentenceTransformer(embedding_model)
-        elif "Embedding Model Override" in settings:
-            embedding_model = settings["Embedding Model Override"]
         else:
             embedding_model = settings["Embedding Model"]
         logger.info("** Embedding Model: " + str(embedding_model))
         ## Prepare question embedding
-        if "Embedding Model Override (Local)" in settings:
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
             embedded_message = embedding.encode([message.content])[0]
         else:
             embedding_settings = {
@@ -328,7 +330,11 @@ def chat_stream(message, thread, panel, message_prepped, user_message_count, set
         logger.info("Message history: " + str(message_prepped))
         client_settings = {
             "api_key": settings.get("API Key"),
-            "base_url": settings.get("URL Base"),
+            "base_url": (
+                settings.get("URL Base", "").rstrip("/")
+                if settings.get("URL Base") is not None
+                else None
+            ),
             "organization": settings.get("Organization ID"),
         }
         client_settings_trimmed = {

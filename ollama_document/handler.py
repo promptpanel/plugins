@@ -1,3 +1,4 @@
+import os
 import json
 import litellm
 import logging
@@ -37,14 +38,14 @@ def file_stream(file, thread, panel):
         logger.info("** 1. Parse document with unstructured into elements.")
         yield "Splitting document into chunks..."
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
+
         ## Setup embedding model
-        if "Embedding Model Override (Local)" in settings:
-            embedding_model = settings["Embedding Model Override (Local)"]
-            embedding = SentenceTransformer(embedding_model)
-        elif "Embedding Model Override" in settings:
-            embedding_model = settings["Embedding Model Override"]
-        else:
-            embedding_model = settings["Embedding Model"]
+        embedding_model = settings["Sentence Transformer Embedding (Local)"]
+        embedding = SentenceTransformer(embedding_model)
         logger.info("** Embedding Model: " + str(embedding_model))
         logger.info("** Filepath: " + str(file.filepath))
         ## Partition file
@@ -64,23 +65,7 @@ def file_stream(file, thread, panel):
                 sentences.append(sentence)
                 page_numbers.append(page_number)
         ## Prepare embeddings
-        if "Embedding Model Override (Local)" in settings:
-            embedded_sentences = embedding.encode(sentences)
-        else:
-            embedding_settings = {
-                "model": embedding_model,
-                "api_key": settings.get("API Key"),
-                "input": sentences,
-            }
-            embedding_settings_trimmed = {
-                key: value
-                for key, value in embedding_settings.items()
-                if value is not None
-            }
-            embedded_response = litellm.embedding(**embedding_settings_trimmed)
-            embedded_sentences = [
-                sentence["embedding"] for sentence in embedded_response.data
-            ]
+        embedded_sentences = embedding.encode(sentences)
 
         ## ----- 3. Save content, page number, and vector encoding to pickle.
         logger.info("** 3. Pickle and save content, page, and embeddings.")
@@ -115,7 +100,7 @@ def file_stream(file, thread, panel):
             content="Error: " + str(e),
             thread=thread,
             panel=panel,
-            created_by=message.created_by,
+            created_by=file.created_by,
             metadata={"sender": "error"},
         )
         response_message.save()
@@ -132,7 +117,7 @@ def message_handler(message, thread, panel):
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
-def chat_stream(message, thread, panel, message_history, user_message_count, settings):
+def chat_stream(message, thread, panel):
     ## Function:
     ## 1. Get settings.
     ## 2. Enrich incoming message with token_count.
@@ -147,6 +132,16 @@ def chat_stream(message, thread, panel, message_history, user_message_count, set
         ## ----- 1. Get settings.
         logger.info("** 1. Preparing settings")
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
+        ## Thread settings
+        thread_settings = thread.metadata
+        if thread_settings.get("ollamaModel") is not None:
+            ollama_model_name = thread_settings.get("ollamaModel")
+        else:
+            raise ValueError("No Ollama model is set for this thread.")
 
         ## ----- 2. Enrich incoming message with token_count.
         logger.info("** 2. Enriching incoming message with token_count")
@@ -160,32 +155,11 @@ def chat_stream(message, thread, panel, message_history, user_message_count, set
         ## ----- 3. Encode message as question. Retrieve similar document content as context.
         logger.info("** 3. Embed message. Retrieve content")
         ## Setup embedding model
-        if "Embedding Model Override (Local)" in settings:
-            embedding_model = settings["Embedding Model Override (Local)"]
-            embedding = SentenceTransformer(embedding_model)
-        elif "Embedding Model Override" in settings:
-            embedding_model = settings["Embedding Model Override"]
-        else:
-            embedding_model = settings["Embedding Model"]
+        embedding_model = settings["Sentence Transformer Embedding (Local)"]
+        embedding = SentenceTransformer(embedding_model)
         logger.info("** Embedding Model: " + str(embedding_model))
         ## Prepare question embedding
-        if "Embedding Model Override (Local)" in settings:
-            embedded_message = embedding.encode([message.content])[0]
-        else:
-            embedding_settings = {
-                "model": embedding_model,
-                "api_key": settings.get("API Key"),
-                "input": [message.content],
-            }
-            embedding_settings_trimmed = {
-                key: value
-                for key, value in embedding_settings.items()
-                if value is not None
-            }
-            embedded_response = litellm.embedding(**embedding_settings_trimmed)
-            embedded_message = [
-                sentence["embedding"] for sentence in embedded_response.data
-            ][0]
+        embedded_message = embedding.encode([message.content])[0]
 
         files = File.objects.filter(
             created_by=message.created_by, panel_id=panel.id, thread_id=thread.id
@@ -233,7 +207,9 @@ def chat_stream(message, thread, panel, message_history, user_message_count, set
                     sentence_to_add += "Please use the following document context to help inform your answer:\n\n"
                 sentence_to_add += f"From File: {filename} Context: {sentence} \n"
                 sentence_count = len(
-                    litellm.encode(model=ollama_model, text=sentence_to_add)
+                    litellm.encode(
+                        model=f"openai/{ollama_model_name}", text=sentence_to_add
+                    )
                 )
                 logger.info("Chunk token count: " + str(sentence_count))
                 if document_token_count + sentence_count <= max_document_tokens:
@@ -294,19 +270,13 @@ def chat_stream(message, thread, panel, message_history, user_message_count, set
         message_history.extend(system_message)
         message_history.reverse()
 
-        thread_settings = thread.metadata
-        if thread_settings.get("ollamaModel") is not None:
-            ollama_model_name = thread_settings.get("ollamaModel")
-        else:
-            raise ValueError("No Ollama model is set for this thread.")
-
         ## ----- 6. Execute chat
         logger.info("** 6. Execute chat")
         logger.info("Message history: " + str(message_history))
         # Preparing completion settings for call
         completion_settings = {
             "stream": True,
-            "api_base": "http://localhost:4010/v1",
+            "api_base": os.getenv("PROMPT_OLLAMA_HOST", "") + "/v1",
             "api_key": "sk-dummy",
             "model": f"openai/{ollama_model_name}",
             "messages": message_history,
@@ -381,7 +351,7 @@ def chat_stream(message, thread, panel, message_history, user_message_count, set
             title_enrich.append({"role": "user", "content": message.content})
             title_settings = {
                 "stream": False,
-                "api_base": "http://localhost:4010/v1",
+                "api_base": os.getenv("PROMPT_OLLAMA_HOST", "") + "/v1",
                 "api_key": "sk-dummy",
                 "model": f"openai/{ollama_model_name}",
                 "messages": title_enrich,

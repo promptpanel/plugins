@@ -37,13 +37,18 @@ def file_stream(file, thread, panel):
         logger.info("** 1. Parse document with unstructured into elements.")
         yield "Splitting document into chunks..."
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
+
         ## Setup embedding model
-        if "Embedding Model Override (Local)" in settings:
-            embedding_model = settings["Embedding Model Override (Local)"]
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
+            logger.info("** Embedding Mode: Sentence Tranformer")
+            embedding_model = settings["Sentence Transformer Embedding (Local)"]
             embedding = SentenceTransformer(embedding_model)
-        elif "Embedding Model Override" in settings:
-            embedding_model = settings["Embedding Model Override"]
         else:
+            logger.info("** Embedding Mode: Embedding Model")
             embedding_model = settings["Embedding Model"]
         logger.info("** Embedding Model: " + str(embedding_model))
         logger.info("** Filepath: " + str(file.filepath))
@@ -64,7 +69,7 @@ def file_stream(file, thread, panel):
                 sentences.append(sentence)
                 page_numbers.append(page_number)
         ## Prepare embeddings
-        if "Embedding Model Override (Local)" in settings:
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
             embedded_sentences = embedding.encode(sentences)
         else:
             embedding_settings = {
@@ -115,7 +120,7 @@ def file_stream(file, thread, panel):
             content="Error: " + str(e),
             thread=thread,
             panel=panel,
-            created_by=message.created_by,
+            created_by=file.created_by,
             metadata={"sender": "error"},
         )
         response_message.save()
@@ -147,13 +152,14 @@ def chat_stream(message, thread, panel):
         ## ----- 1. Get settings.
         logger.info("** 1. Preparing settings")
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
 
         ## ----- 2. Enrich incoming message with token_count.
         logger.info("** 2. Enriching incoming message with token_count")
-        if settings.get("Completion Model Override") is not None:
-            completion_model = settings.get("Completion Model Override")
-        else:
-            completion_model = settings.get("Model")
+        completion_model = settings.get("Model")
         new_message = [{"role": "user", "content": message.content}]
         token_count = litellm.token_counter(
             model=completion_model, messages=new_message
@@ -166,16 +172,14 @@ def chat_stream(message, thread, panel):
         ## ----- 3. Encode message as question. Retrieve similar document content as context.
         logger.info("** 3. Embed message. Retrieve content")
         ## Setup embedding model
-        if "Embedding Model Override (Local)" in settings:
-            embedding_model = settings["Embedding Model Override (Local)"]
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
+            embedding_model = settings["Sentence Transformer Embedding (Local)"]
             embedding = SentenceTransformer(embedding_model)
-        elif "Embedding Model Override" in settings:
-            embedding_model = settings["Embedding Model Override"]
         else:
             embedding_model = settings["Embedding Model"]
         logger.info("** Embedding Model: " + str(embedding_model))
         ## Prepare question embedding
-        if "Embedding Model Override (Local)" in settings:
+        if settings.get("Sentence Transformer Embedding (Local)") not in [None]:
             embedded_message = embedding.encode([message.content])[0]
         else:
             embedding_settings = {
@@ -306,14 +310,14 @@ def chat_stream(message, thread, panel):
         # Preparing completion settings for call
         completion_settings = {
             "stream": True,
-            "model": (
-                settings.get("Completion Model Override")
-                if settings.get("Completion Model Override") is not None
-                else settings.get("Model")
-            ),
+            "model": settings.get("Model"),
             "messages": message_history,
             "api_key": settings.get("API Key"),
-            "api_base": settings.get("URL Base"),
+            "api_base": (
+                settings.get("URL Base", "").rstrip("/")
+                if settings.get("URL Base") is not None
+                else None
+            ),
             "api_version": settings.get("API Version"),
             "organization": settings.get("Organization ID"),
             "stop": settings.get("Stop Sequence"),
@@ -368,10 +372,6 @@ def chat_stream(message, thread, panel):
 
         ## ----- 7. Enrich response message with token_count.
         logger.info("** 7. Enrich response message with token_count")
-        if settings.get("Completion Model Override") is not None:
-            completion_model = settings.get("Completion Model Override")
-        else:
-            completion_model = settings.get("Model")
         new_message = [{"role": "assistant", "content": response_content}]
         token_count = litellm.token_counter(
             model=completion_model, messages=new_message
@@ -398,14 +398,14 @@ def chat_stream(message, thread, panel):
             title_enrich.append({"role": "user", "content": message.content})
             title_settings = {
                 "stream": False,
-                "model": (
-                    settings.get("Simple Model Override")
-                    if settings.get("Simple Model Override") is not None
-                    else settings.get("Model")
-                ),
+                "model": settings.get("Simple Model"),
                 "messages": title_enrich,
                 "api_key": settings.get("API Key"),
-                "api_base": settings.get("URL Base"),
+                "api_base": (
+                    settings.get("URL Base", "").rstrip("/")
+                    if settings.get("URL Base") is not None
+                    else None
+                ),
                 "api_version": settings.get("API Version"),
                 "organization": settings.get("Organization ID"),
                 "max_tokens": 34,

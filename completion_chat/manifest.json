@@ -1,10 +1,10 @@
 {
-  "name": "OpenAI (Completion) - Chat",
+  "name": "LLM (Completion) - Chat",
   "category": "Chat",
   "settings": [
     {
       "name": "Model",
-      "description": "The model you want to use.",
+      "description": "The completion model you want to use.",
       "default": "gpt-3.5-turbo-instruct",
       "type": "text",
       "required": false
@@ -25,16 +25,16 @@
     },
     {
       "name": "API Key",
-      "description": "API access key. If using OpenAI, get yours from https://platform.openai.com/api-keys",
+      "description": "API access key for connecting to API. OpenAI compatible APIs usually need a placeholder for this field.",
       "type": "text",
       "required": false
     },
     {
       "name": "URL Base",
-      "description": "The APIs URL base. Good for connecting to other compatible APIs as well.",
+      "description": "The APIs URL base. Good for connecting to other OpenAI compatible APIs as well.",
       "type": "text",
       "default": "https://api.openai.com/v1",
-      "required": true
+      "required": false
     },
     {
       "name": "Max Tokens to Generate",

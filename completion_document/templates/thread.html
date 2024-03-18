@@ -276,14 +276,10 @@
             <div x-show="fileStream !== ''">
               <div class="mb-10">
                 <div class="z-[0] relative rounded-t-md rounded-br-md w-11/12 py-2.5">
-                  <p x-html="fileStream" class="mr-1.5 w-full space-y-6 masked text-lg">File Upload Status</p>
+                  <p x-html="fileStream" class="mr-1.5 w-full space-y-6 masked text-lg">Message Content</p>
                 </div>
-                <div id="processingChat" class="mb-6 flex items-center justify-center font-semibold text-sm text-stone-500 w-max bg-stone-100 px-3 h-8 rounded-full">
-                  <span class="relative flex h-2 w-2 mr-1.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-50"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                  </span>
-                  Processing File
+                <div class="flex items-center text-sm text-stone-500 w-full mt-0.5">
+                  <p>Parsing File</p>
                 </div>
               </div>
             </div>
@@ -305,7 +301,7 @@
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-50"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Thinking of a response...
+                Processing...
               </div>
             </div>
 

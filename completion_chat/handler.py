@@ -39,7 +39,7 @@ def message_handler(message, thread, panel):
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
-def chat_stream(message, thread, panel, message_prepped, user_message_count, settings):
+def chat_stream(message, thread, panel):
     ## Function:
     ## 1. Get settings.
     ## 2. Enrich incoming message with token_count.
@@ -52,6 +52,10 @@ def chat_stream(message, thread, panel, message_prepped, user_message_count, set
         ## ----- 1. Get settings.
         logger.info("** 1. Preparing settings")
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
 
         ## ----- 2. Enrich incoming message with token_count.
         logger.info("** 2. Enriching incoming message with token_count")
@@ -133,7 +137,11 @@ def chat_stream(message, thread, panel, message_prepped, user_message_count, set
         logger.info("Message history: " + str(message_prepped))
         client_settings = {
             "api_key": settings.get("API Key"),
-            "base_url": settings.get("URL Base"),
+            "base_url": (
+                settings.get("URL Base", "").rstrip("/")
+                if settings.get("URL Base") is not None
+                else None
+            ),
             "organization": settings.get("Organization ID"),
         }
         client_settings_trimmed = {

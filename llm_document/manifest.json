@@ -1,13 +1,118 @@
 {
-  "name": "LLM (Completion) - Docs",
+  "name": "LLM  - Docs",
   "category": "Document (RAG)",
   "settings": [
     {
       "name": "Model",
-      "description": "The model you want to use.",
-      "default": "gpt-3.5-turbo-instruct",
+      "description": "The language model you want to use. Any LiteLLM model provider is available: https://docs.litellm.ai/docs/providers",
+      "default": "gpt-4-0125-preview",
       "type": "text",
-      "required": false
+      "selections": [
+        {
+          "group": "OpenAI",
+          "values": [
+            "gpt-4-0125-preview",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo",
+            "gpt-4"
+          ]
+        },
+        {
+          "group": "Google Gemini",
+          "values": [
+            "gemini/gemini-pro"
+          ]
+        },
+        {
+          "group": "Anthropic",
+          "values": [
+            "claude-3-haiku-20240307",
+            "claude-3-opus-20240229",
+            "claude-3-sonnet-20240229",
+            "claude-2.1",
+            "claude-2",
+            "claude-instant-1.2",
+            "claude-instant-1"
+          ]
+        },
+        {
+          "group": "Cohere",
+          "values": [
+            "command-r",
+            "command-light",
+            "command-medium",
+            "command-medium-beta",
+            "command-xlarge-nightly",
+            "command-nightly"
+          ]
+        },
+        {
+          "group": "Mistral AI API",
+          "values": [
+            "mistral/mistral-tiny",
+            "mistral/mistral-small",
+            "mistral/mistral-medium",
+            "mistral/mistral-large-latest"
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "name": "Simple Model",
+      "description": "Used for miscellaneous tasks like titling threads for lower cost.",
+      "default": "gpt-3.5-turbo-0125",
+      "type": "text",
+      "selections": [
+        {
+          "group": "OpenAI",
+          "values": [
+            "gpt-4-0125-preview",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo",
+            "gpt-4"
+          ]
+        },
+        {
+          "group": "Google Gemini",
+          "values": [
+            "gemini/gemini-pro"
+          ]
+        },
+        {
+          "group": "Anthropic",
+          "values": [
+            "claude-3-haiku-20240307",
+            "claude-3-opus-20240229",
+            "claude-3-sonnet-20240229",
+            "claude-2.1",
+            "claude-2",
+            "claude-instant-1.2",
+            "claude-instant-1"
+          ]
+        },
+        {
+          "group": "Cohere",
+          "values": [
+            "command-r",
+            "command-light",
+            "command-medium",
+            "command-medium-beta",
+            "command-xlarge-nightly",
+            "command-nightly"
+          ]
+        },
+        {
+          "group": "Mistral AI API",
+          "values": [
+            "mistral/mistral-tiny",
+            "mistral/mistral-small",
+            "mistral/mistral-medium",
+            "mistral/mistral-large-latest"
+          ]
+        }
+      ],
+      "required": true
     },
     {
       "name": "Embedding Model",
@@ -60,26 +165,14 @@
       "name": "System Message",
       "description": "A message to help instruct the model on it's usage and how to behave.",
       "type": "textarea",
-      "default": "You are a helpful AI model.",
+      "default": "You are a helpful AI assistant.",
       "required": true
     },
     {
       "name": "API Key",
-      "description": "API access key for connecting to API. OpenAI compatible APIs usually need a placeholder for this field.",
+      "description": "API access key for connecting to API.",
       "type": "text",
-      "required": false
-    },
-    {
-      "name": "URL Base",
-      "description": "The APIs URL base. Good for connecting to other OpenAI compatible APIs as well.",
-      "type": "text",
-      "default": "https://api.openai.com/v1",
       "required": true
-    },
-    {
-      "name": "Max Tokens to Generate",
-      "type": "number",
-      "advanced": true
     },
     {
       "name": "Document Context",
@@ -89,23 +182,24 @@
       "advanced": true
     },
     {
-      "name": "Token Counter",
-      "description": "The counter used for counting token usage.",
-      "default": "openai",
-      "type": "select",
-      "selections": ["openai", "llama"],
+      "name": "Max Tokens to Generate",
+      "type": "number",
       "advanced": true
     },
     {
-      "name": "Prompt Template",
-      "description": "Jinja template used to compose the prompt.",
-      "default": "## SYSTEM: {{ system_message }}\n\n## CONTEXT:\nPlease use the following document context to help inform your answer: {{ document_context }}\n\n## MESSAGE HISTORY:\n{% for message in message_history %}\n{% if message.role == \"user\" %}\nUSER: {{ message.content }}\n{% elif message.role == \"assistant\" %}\nASSISTANT: {{ message.content }}\n{% endif %}\n{% endfor %}\n\n## RESPONSE:",
-      "type": "textarea",
+      "name": "URL Base",
+      "type": "text",
       "advanced": true
     },
     {
       "name": "Organization ID",
       "description": "Used by some vendors to identify the organization using the API.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "API Version",
+      "description": "Used by some vendors to identify the API to use.",
       "type": "text",
       "advanced": true
     },

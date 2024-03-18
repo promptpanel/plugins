@@ -1,13 +1,18 @@
 {
-  "name": "Local Model  - Docs",
+  "name": "Ollama  - Docs",
   "category": "Document (RAG)",
   "settings": [
     {
-      "name": "Embedding Model",
-      "description": "HuggingFace model to use for local embedding (after downloading).",
+      "name": "Sentence Transformer Embedding (Local)",
+      "description": "Use HuggingFace repo to download, will then be usable offline.",
       "default": "sentence-transformers/all-MiniLM-L6-v2",
-      "type": "text",
-      "required": true
+      "type": "select",
+      "selections": [
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "sentence-transformers/all-mpnet-base-v2",
+        "sentence-transformers/stsb-distilroberta-base-v2",
+        "sentence-transformers/all-MiniLM-L12-v2"
+      ]
     },
     {
       "name": "Context Size",

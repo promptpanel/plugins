@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import re
@@ -51,6 +52,16 @@ def chat_stream(message, thread, panel):
         ## ----- 1. Get settings.
         logger.info("** 1. Preparing settings")
         settings = panel.metadata
+        ## Remove blank-string keys
+        keys_to_remove = [k for k, v in settings.items() if v == ""]
+        for key in keys_to_remove:
+            del settings[key]
+        ## Thread settings
+        thread_settings = thread.metadata
+        if thread_settings.get("ollamaModel") is not None:
+            ollama_model_name = thread_settings.get("ollamaModel")
+        else:
+            raise ValueError("No Ollama model is set for this thread.")
 
         ## ----- 2. Enrich incoming message with token_count.
         logger.info("** 2. Enriching incoming message with token_count")
@@ -109,20 +120,13 @@ def chat_stream(message, thread, panel):
         message_history.extend(system_message)
         message_history.reverse()
 
-        thread_settings = thread.metadata
-        if thread_settings.get("ollamaModel") is not None:
-            ollama_model_name = thread_settings.get("ollamaModel")
-            ollama_model = f"ollama/{ollama_model_name}"
-        else:
-            raise ValueError("No Ollama model is set for this thread.")
-
         ## ----- 4. Execute chat
         logger.info("** 4. Sending message")
         logger.info("Message history: " + str(message_history))
         # Preparing completion settings for call
         completion_settings = {
             "stream": True,
-            "api_base": "http://localhost:4010/v1",
+            "api_base": os.getenv("PROMPT_OLLAMA_HOST", "") + "/v1",
             "api_key": "sk-dummy",
             "model": f"openai/{ollama_model_name}",
             "messages": message_history,
@@ -198,7 +202,7 @@ def chat_stream(message, thread, panel):
             title_enrich.append({"role": "user", "content": message.content})
             title_settings = {
                 "stream": False,
-                "api_base": "http://localhost:4010/v1",
+                "api_base": os.getenv("PROMPT_OLLAMA_HOST", "") + "/v1",
                 "api_key": "sk-dummy",
                 "model": f"openai/{ollama_model_name}",
                 "messages": title_enrich,

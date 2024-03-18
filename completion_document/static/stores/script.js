@@ -456,7 +456,7 @@ var pluginState = () => {
         }
       }
       // Set Ollama active model / default model
-      if(Alpine.store("active").isOllama) {
+      if(this.isOllama) {
         this.activeOllamaModel = this.activeThread.metadata && this.activeThread.metadata.ollamaModel ? this.activeThread.metadata.ollamaModel : null;
         setTimeout(() => {
           if (!this.activeThread.metadata || !this.activeThread.metadata.ollamaModel) {
@@ -474,7 +474,7 @@ var pluginState = () => {
               }
             }
           }
-        }, 80);  
+        }, 500);  
       }
     },
     // Messages
