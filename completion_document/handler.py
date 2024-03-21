@@ -136,17 +136,6 @@ def message_handler(message, thread, panel):
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
-def message_handler(message, thread, panel):
-    try:
-        return StreamingHttpResponse(
-            chat_stream(message, thread, panel),
-            content_type="text/plain",
-        )
-    except Exception as e:
-        logger.error(e, exc_info=True)
-        return JsonResponse({"status": "error", "message": str(e)}, status=400)
-
-
 def chat_stream(message, thread, panel):
     ## Function:
     ## 1. Get settings.
