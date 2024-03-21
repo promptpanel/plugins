@@ -16,7 +16,7 @@ This repo contains the community plugins found in PromptPanel as well as a sampl
 
 To get more information about how to build your first plugin we recommend giving a read to: 
 
-- <a href="https://promptpanel.com/plugin-authoring/building-plugins/" target="_new">Building Plugin</a>
+- <a href="https://promptpanel.com/plugin-authoring/building-plugins/" target="_new">Building Plugins</a>
 - <a href="https://promptpanel.com/overview/data-model/" target="_new">Data Model</a>
 
 ## Development
