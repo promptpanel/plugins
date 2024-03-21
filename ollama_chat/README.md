@@ -1,1 +1,1 @@
-Standard Ollama chat implementation with user interface.
+Ollama local / offline chat model. Utilizes the management integration with Ollama - requires the `PROMPT_OLLAMA_HOST` environment variable set on your server. <a class="text-sm underline hover:text-primary" href="https://promptpanel.com/overview/packaged-plugins-models/#ollama-chat" target="_new">More Info</a>

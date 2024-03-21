@@ -1,1 +1,1 @@
-Legacy OpenAI chat implementation with user interface and docs.
+Legacy OpenAI completion-based document upload and retrieval, research augmented generation (RAG) chat plugin. Useful for connecting to **OpenAI Compatible** large language model APIs providers. Uses the legacy OpenAI completion format for chat. Backed by LiteLLM and SentenceTransformers for access to a range of hosted and offline embedding models. <a class="text-sm underline hover:text-primary" href="https://promptpanel.com/overview/packaged-plugins-models/#completion-document" target="_new">More Info</a>
