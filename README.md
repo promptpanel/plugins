@@ -1,4 +1,11 @@
-## Plugins
+<img src="https://promptpanel.com/images/logo.svg" alt="logo" style="width:64px;">
+
+**PromptPanel**\
+The Universal AI Interface\
+<a href="https://promptpanel.com/docs">Documentation</a> | <a href="https://hub.docker.com/r/promptpanel/promptpanel">DockerHub</a> | <a href="https://github.com/promptpanel/promptpanel">PromptPanel Core</a>
+
+
+## Overview
 
 This repo contains the community plugins found in PromptPanel as well as a sample plugin for your first development.
 
@@ -15,6 +22,10 @@ To get more information about how to build your first plugin we recommend giving
 ## Development
 
 Running `docker compose up` from this directory will bring up a development environment you can use to start developing your Plugin.
+
+```bash
+docker compose up
+```
 
 You may want to re-map your port from `4000` if you have another PromptPanel instance running.
 
