@@ -1,0 +1,4 @@
+litellm==1.32.9
+openai==1.14.0
+sentence-transformers==2.5.1
+unstructured[all-docs]==0.12.6

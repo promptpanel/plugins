@@ -1,0 +1,143 @@
+{
+  "name": "LLM (Completion) - Docs",
+  "category": "Document (RAG)",
+  "settings": [
+    {
+      "name": "Model",
+      "description": "The model you want to use.",
+      "default": "gpt-3.5-turbo-instruct",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "Embedding Model",
+      "description": "The GPT-family embedding model you want to use.",
+      "default": "text-embedding-ada-002",
+      "type": "text",
+      "selections": [
+        {
+          "group": "OpenAI",
+          "values": [
+            "text-embedding-ada-002",
+            "text-embedding-3-large",
+            "text-embedding-3-small"
+          ]
+        },
+        {
+          "group": "Cohere",
+          "values": [
+            "embed-english-v3.0",
+            "embed-english-light-v3.0",
+            "embed-multilingual-v3.0",
+            "embed-multilingual-light-v3.0",
+            "embed-english-v2.0",
+            "embed-english-light-v2.0",
+            "embed-multilingual-v2.0"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sentence Transformer Embedding (Local)",
+      "description": "Will take precedence over the Embedding Model defined above. Use HuggingFace repo to download, will then be usable offline.",
+      "default": "",
+      "type": "text",
+      "selections": [
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "sentence-transformers/all-mpnet-base-v2",
+        "sentence-transformers/stsb-distilroberta-base-v2",
+        "sentence-transformers/all-MiniLM-L12-v2"
+      ]
+    },
+    {
+      "name": "Context Size",
+      "description": "The max context size your model supports.",
+      "default": "4096",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "System Message",
+      "description": "A message to help instruct the model on it's usage and how to behave.",
+      "type": "textarea",
+      "default": "You are a helpful AI model.",
+      "required": true
+    },
+    {
+      "name": "API Key",
+      "description": "API access key for connecting to API. OpenAI compatible APIs usually need a placeholder for this field.",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "URL Base",
+      "description": "The APIs URL base. Good for connecting to other OpenAI compatible APIs as well.",
+      "type": "text",
+      "default": "https://api.openai.com/v1",
+      "required": true
+    },
+    {
+      "name": "Max Tokens to Generate",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Document Context",
+      "description": "Number of tokens to use for document context.",
+      "type": "number",
+      "default": "1200",
+      "advanced": true
+    },
+    {
+      "name": "Token Counter",
+      "description": "The counter used for counting token usage.",
+      "default": "openai",
+      "type": "select",
+      "selections": ["openai", "llama"],
+      "advanced": true
+    },
+    {
+      "name": "Prompt Template",
+      "description": "Jinja template used to compose the prompt.",
+      "default": "## SYSTEM: {{ system_message }}\n\n## CONTEXT:\nPlease use the following document context to help inform your answer: {{ document_context }}\n\n## MESSAGE HISTORY:\n{% for message in message_history %}\n{% if message.role == \"user\" %}\nUSER: {{ message.content }}\n{% elif message.role == \"assistant\" %}\nASSISTANT: {{ message.content }}\n{% endif %}\n{% endfor %}\n\n## RESPONSE:",
+      "type": "textarea",
+      "advanced": true
+    },
+    {
+      "name": "Organization ID",
+      "description": "Used by some vendors to identify the organization using the API.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Temperature",
+      "description": "Temperature as a setting that controls the AI's willingness to take risks in its word choices. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. (Between 0.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Top P",
+      "description": "Top P controls the diversity of the AI's responses by only considering a subset of all possible next words that have a cumulative probability above a certain threshold. Recommended to use Temperature OR Top-P, not both. (Between 0.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Stop Sequence",
+      "description": "Sequence where if generated the API will stop generating further tokens.",
+      "type": "text",
+      "advanced": true
+    },
+    {
+      "name": "Presence Penalty",
+      "description": "Aims to reduce the likelihood of the model repeating the same information or topics it has already mentioned in the current text generation task. (Between -2.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    },
+    {
+      "name": "Frequency Penalty",
+      "description": "Aims to decrease the repetition of individual words or phrases within the generated text. (Between -2.0 to 2.0)",
+      "type": "number",
+      "advanced": true
+    }
+  ]
+}

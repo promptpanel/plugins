@@ -1,0 +1,1 @@
+Standard document upload and retrieval, research augmented generation (RAG) chat plugin. Backed by LiteLLM, and SentenceTransformers it is compatible with a range of hosted and offline embedding and large language models. <a class="text-sm underline hover:text-primary" href="https://promptpanel.com/overview/packaged-plugins-models/#llm-document" target="_new">More Info</a>
